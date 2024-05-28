@@ -16,15 +16,26 @@ jobs:
         helm: latest
         yq: latest
 
-    - id: run-diff
-      name: Run diff
-      continue-on-error: true
-      # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
+    - name: Set up Git
       run: |
-        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-        echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
-        kubectl --kubeconfig <(echo ${{ secrets.KUBECONFIG_BASE64_STAG }} | base64 --decode) diff -k ./stag |& tee -a "$GITHUB_OUTPUT" || true
-        echo "$EOF" >> "$GITHUB_OUTPUT"
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+
+    - name: Fetch parent commit
+      run: |
+        # Get the parent commit SHA of the current PR
+        PARENT_SHA=$(git rev-parse HEAD^1)
+        echo "PARENT_SHA=$PARENT_SHA" >> $GITHUB_ENV
+
+    # - id: run-diff
+    #   name: Run diff
+    #   continue-on-error: true
+    #   # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
+    #   run: |
+    #     EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+    #     echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
+    #      >> "$GITHUB_OUTPUT"
+    #     echo "$EOF" >> "$GITHUB_OUTPUT"
 
     - id: pr-comment
       name: Add PR comment
@@ -34,7 +45,7 @@ jobs:
         message-id: stag
         refresh-message-position: true
         message: |
-          ## Staging Diff
+          ## Output
           ```
-          ${{ steps.run-diff.outputs.DIFF_OUT }}
+          $PARENT_SHA
           ```
