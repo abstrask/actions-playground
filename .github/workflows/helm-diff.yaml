@@ -1,0 +1,40 @@
+# https://github.com/recoord/flux-infrastructure/blob/dev/.github/workflows/update-crds.yml
+# https://github.com/recoord/core-devops-engine-k8s-manifests/blob/main/.github/workflows/diff.yml
+
+on:
+  - pull_request
+jobs:
+  helm-diff:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+
+    - uses: alexellis/arkade-get@master
+      with:
+        helm: latest
+        yq: latest
+
+    - id: run-diff
+      name: Run diff
+      continue-on-error: true
+      # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
+      run: |
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
+        kubectl --kubeconfig <(echo ${{ secrets.KUBECONFIG_BASE64_STAG }} | base64 --decode) diff -k ./stag |& tee -a "$GITHUB_OUTPUT" || true
+        echo "$EOF" >> "$GITHUB_OUTPUT"
+
+    - id: pr-comment
+      name: Add PR comment
+      uses: mshick/add-pr-comment@v2
+      if: contains(fromJSON('["pull_request_target"]'), github.event_name)
+      with:
+        message-id: stag
+        refresh-message-position: true
+        message: |
+          ## Staging Diff
+          ```
+          ${{ steps.run-diff.outputs.DIFF_OUT }}
+          ```
