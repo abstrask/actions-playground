@@ -2,7 +2,7 @@
 # https://github.com/recoord/core-devops-engine-k8s-manifests/blob/main/.github/workflows/diff.yml
 
 on:
-  - pull_request
+  - pull_request_target
 jobs:
   helm-diff:
     runs-on: ubuntu-latest
