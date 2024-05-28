@@ -27,6 +27,7 @@ jobs:
         # Get the parent commit SHA of the current PR
         PARENT_SHA=$(git rev-parse HEAD^1)
         echo "PARENT_SHA=$PARENT_SHA" >> $GITHUB_ENV
+        echo $PARENT_SHA
 
     # - id: run-diff
     #   name: Run diff
@@ -48,5 +49,5 @@ jobs:
         message: |
           ## Output
           ```
-          $PARENT_SHA
+          ${{ env.PARENT_SHA }}
           ```
