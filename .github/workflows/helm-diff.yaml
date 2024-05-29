@@ -51,7 +51,7 @@ jobs:
         echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
 
         echo "# Helm diffs" >> "$GITHUB_OUTPUT"
-        echo 'Parent: '"${PARENT_SHA}" >> "$GITHUB_OUTPUT"
+        echo 'Parent: `'"${PARENT_SHA}"'`'' >> "$GITHUB_OUTPUT"
 
         for helm_file in ${MODIFIED_HELM_FILES}; do
           after_name=$(yq '. | select(.kind == "HelmRelease").metadata.name' "${helm_file}")
