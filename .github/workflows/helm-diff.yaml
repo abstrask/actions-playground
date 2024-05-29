@@ -88,9 +88,7 @@ jobs:
           echo >> "$GITHUB_OUTPUT"
           echo "### Diff >> "$GITHUB_OUTPUT"
           echo "```" >> "$GITHUB_OUTPUT"
-          diff <(echo "${before_template}") <(echo "${after_template}") >> "$GITHUB_OUTPUT"
           echo "```" >> "$GITHUB_OUTPUT"
-
         done
         echo "$EOF" >> "$GITHUB_OUTPUT"
 
