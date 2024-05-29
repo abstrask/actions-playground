@@ -44,12 +44,17 @@ jobs:
       # continue-on-error: true
       # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
       env:
+        PARENT_SHA: ${{ env.PARENT_SHA }}
         MODIFIED_HELM_FILES: ${{ steps.changed-files-helm.outputs.modified_files }}
       run: |
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
 
         echo "# Helm diffs" >> "$GITHUB_OUTPUT"
+        echo "Parent: `${PARENT_SHA}`"" >> "$GITHUB_OUTPUT"
+
+        diff --version >> "$GITHUB_OUTPUT"
+        diff --help >> "$GITHUB_OUTPUT"
 
         for helm_file in ${MODIFIED_HELM_FILES}; do
           after_name=$(yq '. | select(.kind == "HelmRelease").metadata.name' "${helm_file}")
@@ -75,7 +80,7 @@ jobs:
           before_template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${before_template}"))
           #yq -P 'sort_keys(..) comments=""' <(echo "${before_template}") > ./before_clean.yaml
 
-          diff=$(diff --strip-trailing-cr <(echo "${before_template_clean}") <(echo "${after_template_clean}"))
+          # diff=$(diff --strip-trailing-cr <(echo "${before_template_clean}") <(echo "${after_template_clean}") | head -n 500)
 
           echo >> "$GITHUB_OUTPUT"
           echo "## ${helm_file}" >> "$GITHUB_OUTPUT"
@@ -106,6 +111,4 @@ jobs:
         message-id: stag
         refresh-message-position: true
         message: |
-          Parent: `${{ env.PARENT_SHA }}`
-
           ${{ steps.run-diff.outputs.DIFF_OUT }}
