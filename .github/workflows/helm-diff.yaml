@@ -41,7 +41,7 @@ jobs:
 
     - id: run-diff
       name: Run diff
-      continue-on-error: true
+      # continue-on-error: true
       # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
       env:
         MODIFIED_HELM_FILES: ${{ steps.changed-files-helm.outputs.modified_files }}
