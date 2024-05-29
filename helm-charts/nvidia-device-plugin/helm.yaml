@@ -48,7 +48,7 @@ spec:
       - key: veo.co/processing-type
         operator: Exists
         effect: NoSchedule
-      - key: veo.co/nodegroup-instance-spot
+      - key: ${flux_toleration_key}
         operator: Exists
         effect: NoSchedule
     updateStrategy:
