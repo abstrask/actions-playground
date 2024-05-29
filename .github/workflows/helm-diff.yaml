@@ -75,21 +75,7 @@ jobs:
 
           echo >> "$GITHUB_OUTPUT"
           echo "## ${helm_file}" >> "$GITHUB_OUTPUT"
-          echo >> "$GITHUB_OUTPUT"
-          echo "### Before" >> "$GITHUB_OUTPUT"
-          echo '```' >> "$GITHUB_OUTPUT"
-          #echo "${before_template}" >> "$GITHUB_OUTPUT"
-          echo '```' >> "$GITHUB_OUTPUT"
-          echo >> "$GITHUB_OUTPUT"
-          echo "### After" >> "$GITHUB_OUTPUT"
-          echo '```' >> "$GITHUB_OUTPUT"
-          echo "${after_template}" >> "$GITHUB_OUTPUT"
-          echo '```' >> "$GITHUB_OUTPUT"
-          echo >> "$GITHUB_OUTPUT"
-          echo "### Diff" >> "$GITHUB_OUTPUT"
-          echo '```' >> "$GITHUB_OUTPUT"
-          diff <(echo "${before_template}") <(echo "${after_template}") >> "$GITHUB_OUTPUT"
-          echo '```' >> "$GITHUB_OUTPUT"
+          echo "${after_template_clean}" >> "$GITHUB_OUTPUT"
         done
         echo "$EOF" >> "$GITHUB_OUTPUT"
 
