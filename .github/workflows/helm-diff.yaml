@@ -46,9 +46,10 @@ jobs:
       env:
         MODIFIED_HELM_FILES: ${{ steps.changed-files-helm.outputs.modified_files }}
       run: |
-        echo Changed files: "$MODIFIED_HELM_FILES"
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
+
+        echo Changed files: "$MODIFIED_HELM_FILES" >> "$GITHUB_OUTPUT"
 
         for file in ${MODIFIED_HELM_FILES}; do
           echo "Modofied: ${file}"
