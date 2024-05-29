@@ -50,8 +50,21 @@ jobs:
         echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
 
         echo "# Helm diffs" >> "$GITHUB_OUTPUT"
-        for file in ${MODIFIED_HELM_FILES}; do
-          echo "## ${file}" >> "$GITHUB_OUTPUT"
+        for helm_file in ${MODIFIED_HELM_FILES}; do
+          after_name=$(yq '. | select(.kind == "HelmRelease").metadata.name' "${helm_file}")
+          after_namespace=$(yq '. | select(.kind == "HelmRelease").metadata.namespace' "${helm_file}")
+          after_version=$(yq '. | select(.kind == "HelmRelease") | .spec.chart.spec.version' "${helm_file}")
+          after_url=$(yq '. | select(.kind == "HelmRepository") | .spec.url' "${helm_file}")
+          after_chart=$(yq '. | select(.kind == "HelmRelease") | .spec.chart.spec.chart' "${helm_file}")
+
+          before_helm_content=$(git show $PARENT_SHA:$helm_file)
+          before_name=$(yq '. | select(.kind == "HelmRelease").metadata.name' <(echo "${before_helm_content}"))
+          before_namespace=$(yq '. | select(.kind == "HelmRelease").metadata.namespace' <(echo "${before_helm_content}"))
+          before_version=$(yq '. | select(.kind == "HelmRelease") | .spec.chart.spec.version' <(echo "${before_helm_content}"))
+          before_url=$(yq '. | select(.kind == "HelmRepository") | .spec.url' <(echo "${before_helm_content}"))
+          before_chart=$(yq '. | select(.kind == "HelmRelease") | .spec.chart.spec.chart' <(echo "${before_helm_content}"))
+
+          echo "## ${helm_file}" >> "$GITHUB_OUTPUT"
         done
 
         FILE_PATH=./README.md
