@@ -79,6 +79,10 @@ jobs:
           echo '```' >> "$GITHUB_OUTPUT"
           echo "${before_template_clean}" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
+          echo "### After" >> "$GITHUB_OUTPUT"
+          echo '```' >> "$GITHUB_OUTPUT"
+          echo "${after_template_clean}" >> "$GITHUB_OUTPUT"
+          echo '```' >> "$GITHUB_OUTPUT"
         done
         echo "$EOF" >> "$GITHUB_OUTPUT"
 
