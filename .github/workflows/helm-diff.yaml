@@ -75,7 +75,7 @@ jobs:
           before_template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${before_template}"))
           #yq -P 'sort_keys(..) comments=""' <(echo "${before_template}") > ./before_clean.yaml
 
-          diff=$(diff <(echo "${before_template_clean}") <(echo "${after_template_clean}") | head -n 100)
+          diff=$(diff --strip-trailing-cr <(echo "${before_template_clean}") <(echo "${after_template_clean}") | head -n 100)
 
           echo >> "$GITHUB_OUTPUT"
           echo "## ${helm_file}" >> "$GITHUB_OUTPUT"
