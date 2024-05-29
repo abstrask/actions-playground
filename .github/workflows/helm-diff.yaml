@@ -32,16 +32,31 @@ jobs:
         echo "PARENT_SHA=$PARENT_SHA" >> $GITHUB_ENV
         echo $PARENT_SHA
 
+    - name: Get changed Helm files
+      id: changed-files-helm
+      uses: tj-actions/changed-files@v44
+      with:
+        files: |
+          helm-charts/*/helm.yaml
+
     - id: run-diff
       name: Run diff
       continue-on-error: true
       # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
+      env:
+        MODIFIED_HELM_FILES: ${{ steps.changed-files-helm.outputs.modified_files }}
       run: |
+        echo Changed files: "$MODIFIED_HELM_FILES"
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
+
+        for file in ${MODIFIED_HELM_FILES}; do
+          echo "Modofied: ${file}"
+          # touch ${file}
+        done
+
         FILE_PATH=./README.md
         README=$(git show $PARENT_SHA:$FILE_PATH)
-        echo "$README" >> "$GITHUB_OUTPUT"
         echo "$EOF" >> "$GITHUB_OUTPUT"
 
     - id: pr-comment
@@ -52,8 +67,6 @@ jobs:
         message-id: stag
         refresh-message-position: true
         message: |
-          ## Output
           Parent: `${{ env.PARENT_SHA }}`
-          ```
+
           ${{ steps.run-diff.outputs.DIFF_OUT }}
-          ```
