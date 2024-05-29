@@ -32,15 +32,17 @@ jobs:
         echo "PARENT_SHA=$PARENT_SHA" >> $GITHUB_ENV
         echo $PARENT_SHA
 
-    # - id: run-diff
-    #   name: Run diff
-    #   continue-on-error: true
-    #   # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
-    #   run: |
-    #     EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-    #     echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
-    #      >> "$GITHUB_OUTPUT"
-    #     echo "$EOF" >> "$GITHUB_OUTPUT"
+    - id: run-diff
+      name: Run diff
+      continue-on-error: true
+      # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
+      run: |
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
+        FILE_PATH=./README.md
+        README=$(git show $PARENT_SHA:$FILE_PATH)
+        echo "$README" >> "$GITHUB_OUTPUT"
+        echo "$EOF" >> "$GITHUB_OUTPUT"
 
     - id: pr-comment
       name: Add PR comment
@@ -51,6 +53,7 @@ jobs:
         refresh-message-position: true
         message: |
           ## Output
+          Parent: `${{ env.PARENT_SHA }}`
           ```
-          ${{ env.PARENT_SHA }}
+          ${{ steps.run-diff.outputs.DIFF_OUT }}
           ```
