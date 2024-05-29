@@ -83,6 +83,10 @@ jobs:
           echo '```' >> "$GITHUB_OUTPUT"
           echo "${after_template_clean}" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
+          echo "### Diff" >> "$GITHUB_OUTPUT"
+          echo '```' >> "$GITHUB_OUTPUT"
+          diff <(echo "${before_template_clean}") <(echo "${after_template_clean}") >> "$GITHUB_OUTPUT"
+          echo '```' >> "$GITHUB_OUTPUT"
         done
         echo "$EOF" >> "$GITHUB_OUTPUT"
 
