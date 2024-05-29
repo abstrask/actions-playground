@@ -49,11 +49,9 @@ jobs:
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
 
-        echo Changed files: "$MODIFIED_HELM_FILES" >> "$GITHUB_OUTPUT"
-
+        echo "# Helm diffs" >> "$GITHUB_OUTPUT"
         for file in ${MODIFIED_HELM_FILES}; do
-          echo "Modofied: ${file}"
-          # touch ${file}
+          echo "## ${file}" >> "$GITHUB_OUTPUT"
         done
 
         FILE_PATH=./README.md
