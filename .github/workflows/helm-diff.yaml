@@ -57,6 +57,10 @@ jobs:
           after_url=$(yq '. | select(.kind == "HelmRepository") | .spec.url' "${helm_file}")
           after_chart=$(yq '. | select(.kind == "HelmRelease") | .spec.chart.spec.chart' "${helm_file}")
 
+          after_values=$(yq '. | select(.kind == "HelmRelease").spec.values' "${helm_file}")
+          after_template=$(helm template "${after_name}" -n "${after_namespace}" "${after_chart}" --repo "${after_url}" --version "${after_version}" -f <(echo "${after_values}"))
+          after_template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${after_template}"))
+
           before_helm_content=$(git show $PARENT_SHA:$helm_file)
           before_name=$(yq '. | select(.kind == "HelmRelease").metadata.name' <(echo "${before_helm_content}"))
           before_namespace=$(yq '. | select(.kind == "HelmRelease").metadata.namespace' <(echo "${before_helm_content}"))
@@ -64,11 +68,15 @@ jobs:
           before_url=$(yq '. | select(.kind == "HelmRepository") | .spec.url' <(echo "${before_helm_content}"))
           before_chart=$(yq '. | select(.kind == "HelmRelease") | .spec.chart.spec.chart' <(echo "${before_helm_content}"))
 
-          echo "## ${helm_file}" >> "$GITHUB_OUTPUT"
-        done
+          before_values=$(yq '. | select(.kind == "HelmRelease").spec.values' <(echo "${before_helm_content}"))
+          before_template=$(helm template "${before_name}" -n "${before_namespace}" "${before_chart}" --repo "${before_url}" --version "${before_version}" -f <(echo "${before_values}"))
+          before_template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${before_template}"))
 
-        FILE_PATH=./README.md
-        README=$(git show $PARENT_SHA:$FILE_PATH)
+          echo "## ${helm_file}" >> "$GITHUB_OUTPUT"
+          echo "```" >> "$GITHUB_OUTPUT"
+          diff <(echo "${before_template_clean}") <(echo "${after_template_clean}") >> "$GITHUB_OUTPUT"
+          echo "```" >> "$GITHUB_OUTPUT"
+        done
         echo "$EOF" >> "$GITHUB_OUTPUT"
 
     - id: pr-comment
