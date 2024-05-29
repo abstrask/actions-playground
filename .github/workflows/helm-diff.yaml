@@ -75,8 +75,6 @@ jobs:
           before_template=$(helm template "${before_name}" -n "${before_namespace}" "${before_chart}" --repo "${before_url}" --version "${before_version}" -f <(echo "${before_values}"))
           before_template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${before_template}"))
 
-          #diff=$(diff --color=never --strip-trailing-cr --ignore-all-space <(echo "${before_template_clean}") <(echo "${after_template_clean}") | head -n 500)
-
           echo >> "$GITHUB_OUTPUT"
           echo "## ${helm_file}" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
