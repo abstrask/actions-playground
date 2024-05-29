@@ -60,8 +60,8 @@ jobs:
 
           after_values=$(yq '. | select(.kind == "HelmRelease").spec.values' "${helm_file}")
           after_template=$(helm template "${after_name}" -n "${after_namespace}" "${after_chart}" --repo "${after_url}" --version "${after_version}" -f <(echo "${after_values}"))
-          #after_template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${after_template}"))
-          yq -P 'sort_keys(..) comments=""' <(echo "${after_template}") > ./after_clean.yaml
+          after_template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${after_template}"))
+          #yq -P 'sort_keys(..) comments=""' <(echo "${after_template}") > ./after_clean.yaml
 
           before_helm_content=$(git show $PARENT_SHA:$helm_file)
           before_name=$(yq '. | select(.kind == "HelmRelease").metadata.name' <(echo "${before_helm_content}"))
@@ -72,25 +72,28 @@ jobs:
 
           before_values=$(yq '. | select(.kind == "HelmRelease").spec.values' <(echo "${before_helm_content}"))
           before_template=$(helm template "${before_name}" -n "${before_namespace}" "${before_chart}" --repo "${before_url}" --version "${before_version}" -f <(echo "${before_values}"))
-          #before_template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${before_template}"))
-          yq -P 'sort_keys(..) comments=""' <(echo "${before_template}") > ./before_clean.yaml
+          before_template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${before_template}"))
+          #yq -P 'sort_keys(..) comments=""' <(echo "${before_template}") > ./before_clean.yaml
+
+          diff=$(diff <(echo "${before_template_clean}") <(echo "${after_template_clean}"))
 
           echo >> "$GITHUB_OUTPUT"
           echo "## ${helm_file}" >> "$GITHUB_OUTPUT"
           echo "### Before" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
-          #echo "${before_template_clean}" >> "$GITHUB_OUTPUT"
-          cat ./before_clean.yaml >> "$GITHUB_OUTPUT"
+          echo "${before_template_clean}" >> "$GITHUB_OUTPUT"
+          #cat ./before_clean.yaml >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
           echo "### After" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
-          #echo "${after_template_clean}" >> "$GITHUB_OUTPUT"
-          cat ./after_clean.yaml >> "$GITHUB_OUTPUT"
+          echo "${after_template_clean}" >> "$GITHUB_OUTPUT"
+          #cat ./after_clean.yaml >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
           echo "### Diff" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
           # diff <(echo "${before_template_clean}") <(echo "${after_template_clean}") >> "$GITHUB_OUTPUT"
           # diff ./before_clean.yaml ./after_clean.yaml >> "$GITHUB_OUTPUT"
+          echo "${diff}" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
         done
         echo "$EOF" >> "$GITHUB_OUTPUT"
