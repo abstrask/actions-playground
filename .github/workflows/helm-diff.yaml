@@ -51,7 +51,7 @@ jobs:
         echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
 
         echo "# Helm diffs" >> "$GITHUB_OUTPUT"
-        echo "Parent: \`${PARENT_SHA}\`"" >> "$GITHUB_OUTPUT"
+        echo "Parent: ``${PARENT_SHA}``"" >> "$GITHUB_OUTPUT"
 
         diff --version >> "$GITHUB_OUTPUT"
         diff --help >> "$GITHUB_OUTPUT"
