@@ -73,15 +73,22 @@ jobs:
           before_template=$(helm template "${before_name}" -n "${before_namespace}" "${before_chart}" --repo "${before_url}" --version "${before_version}" -f <(echo "${before_values}"))
           before_template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${before_template}"))
 
+          echo >> "$GITHUB_OUTPUT"
           echo "## ${helm_file}" >> "$GITHUB_OUTPUT"
+          echo >> "$GITHUB_OUTPUT"
           echo "### Before >> "$GITHUB_OUTPUT"
           echo "```" >> "$GITHUB_OUTPUT"
-          echo "${before_template_clean}" >> "$GITHUB_OUTPUT"
+          echo "${before_template}" >> "$GITHUB_OUTPUT"
           echo "```" >> "$GITHUB_OUTPUT"
           echo >> "$GITHUB_OUTPUT"
           echo "### After >> "$GITHUB_OUTPUT"
           echo "```" >> "$GITHUB_OUTPUT"
-          echo "${after_template_clean}" >> "$GITHUB_OUTPUT"
+          echo "${after_template}" >> "$GITHUB_OUTPUT"
+          echo "```" >> "$GITHUB_OUTPUT"
+          echo >> "$GITHUB_OUTPUT"
+          echo "### Diff >> "$GITHUB_OUTPUT"
+          echo "```" >> "$GITHUB_OUTPUT"
+          diff <(echo "${before_template}") <(echo "${after_template}") >> "$GITHUB_OUTPUT"
           echo "```" >> "$GITHUB_OUTPUT"
 
         done
