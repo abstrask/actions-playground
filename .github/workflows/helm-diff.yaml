@@ -94,7 +94,7 @@ jobs:
           echo "### Diff" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
           # diff --color=never --strip-trailing-cr --ignore-all-space <(echo "${before_template_clean}") <(echo "${after_template_clean}") | head -n 500 >> "$GITHUB_OUTPUT"
-          diff --strip-trailing-cr --ignore-all-space <(echo "${before_template_clean}") <(echo "${after_template_clean}") || true >> "$GITHUB_OUTPUT"
+          diff --strip-trailing-cr --ignore-all-space <(echo "${before_template_clean}") <(echo "${after_template_clean}") >> "$GITHUB_OUTPUT" || true
           # diff ./before_clean.yaml ./after_clean.yaml >> "$GITHUB_OUTPUT"
           # echo "${diff}" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
