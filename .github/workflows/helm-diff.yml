@@ -2,7 +2,30 @@ name: Helm diff
 on:
   - pull_request_target
 jobs:
+  path-filter:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read # fix "Resource not accessible by integration" error
+    outputs:
+      base: ${{ steps.filter.outputs.helm }}
+    steps:
+    - id: checkout-base
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref }}
+
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        base: main
+        filters: |
+          helm:
+            - 'helm-charts/*/helm.yaml'
+
   helm-diff:
+    needs: path-filter
+    if: ${{ needs.path-filter.outputs.helm == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
