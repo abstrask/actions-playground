@@ -15,10 +15,9 @@ jobs:
       with:
         ref: ${{ github.head_ref }}
 
-    - uses: dorny/paths-filter@v2
+    - uses: dorny/paths-filter@v3
       id: filter
       with:
-        base: main
         filters: |
           helm:
             - 'helm-charts/*/helm.yaml'
