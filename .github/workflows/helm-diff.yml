@@ -1,6 +1,3 @@
-# https://github.com/recoord/flux-infrastructure/blob/dev/.github/workflows/update-crds.yml
-# https://github.com/recoord/core-devops-engine-k8s-manifests/blob/main/.github/workflows/diff.yml
-
 name: Helm diff
 on:
   - pull_request_target
