@@ -64,7 +64,7 @@ jobs:
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
 
-        echo "# Helm diffs" >> "$GITHUB_OUTPUT"
+        echo "## Helm diffs" >> "$GITHUB_OUTPUT"
 
         for helm_file in ${MODIFIED_HELM_FILES}; do
           echo "Processing file: $helm_file"
@@ -105,7 +105,7 @@ jobs:
 
           # Generate output
           echo >> "$GITHUB_OUTPUT"
-          echo "## ${helm_file}" >> "$GITHUB_OUTPUT"
+          echo "### ${helm_file}" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
           echo "${diff}" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
