@@ -1,8 +1,12 @@
+# https://github.com/recoord/flux-infrastructure/blob/dev/.github/workflows/update-crds.yml
+# https://github.com/recoord/core-devops-engine-k8s-manifests/blob/main/.github/workflows/diff.yml
+
 name: Helm diff
 on:
   - pull_request_target
 jobs:
-  path-filter:
+  path_filter:
+    name: Filter Helm templates
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -10,7 +14,7 @@ jobs:
     outputs:
       helm: ${{ steps.filter.outputs.helm }}
     steps:
-    - id: checkout-base
+    - id: checkout_base
       uses: actions/checkout@v4
       with:
         ref: ${{ github.head_ref }}
@@ -20,24 +24,25 @@ jobs:
       with:
         filters: |
           helm:
-            - 'helm-charts/*/helm.yaml'
+            - 'infrastructure/base/*/helm.yaml'
 
-  helm-diff:
-    needs: path-filter
-    if: ${{ needs.path-filter.outputs.helm == 'true' }}
+  helm_diff:
+    name: Diff changed Helm templates
+    needs: path_filter
+    if: ${{ needs.path_filter.outputs.helm == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
 
     steps:
-    - id: checkout-base
+    - id: checkout_base
       uses: actions/checkout@v4
       with:
         ref: ${{ github.base_ref }}
         path: base
 
-    - id: checkout-head
+    - id: checkout_head
       uses: actions/checkout@v4
       with:
         ref: ${{ github.head_ref }}
@@ -49,76 +54,92 @@ jobs:
         yq: latest
 
     - name: Get changed Helm files
-      id: changed-files-helm
+      id: changed_files_helm
       uses: tj-actions/changed-files@v44
       with:
         files: |
-          helm-charts/*/helm.yaml
+          infrastructure/base/*/helm.yaml
 
-    - id: run-diff
+    - id: run_diff
       name: Run diff
       # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
       env:
-        MODIFIED_HELM_FILES: ${{ steps.changed-files-helm.outputs.modified_files }}
+        MODIFIED_HELM_FILES: ${{ steps.changed_files_helm.outputs.modified_files }}
       run: |
+        helm_template() {
+          if [[ -z "${2}" ]]; then
+            echo "Need file name to template" >&2; return 1
+          fi
+          helm_file="${2}"
+          name=$(yq '. | select(.kind == "HelmRelease").metadata.name' "${helm_file}")
+          namespace=$(yq '. | select(.kind == "HelmRelease").metadata.namespace' "${helm_file}")
+          version=$(yq '. | select(.kind == "HelmRelease") | .spec.chart.spec.version' "${helm_file}")
+          url=$(yq '. | select(.kind == "HelmRepository") | .spec.url' "${helm_file}")
+          chart=$(yq '. | select(.kind == "HelmRelease") | .spec.chart.spec.chart' "${helm_file}")
+          values=$(yq '. | select(.kind == "HelmRelease").spec.values' "${helm_file}")
+          echo "Chart version ${1}: $version ($chart from $url)" >&2
+          template_out=$(helm template "${name}" -n "${namespace}" "${chart}" --repo "${url}" --version "${version}" -f <(echo "${values}")  2>&1) || {
+            echo "$template_out"
+            return 1
+          }
+          # template_clean=$(yq -P 'sort_keys(..) comments=""' -o=props <(echo "${template_out}"))
+          template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${template_out}"))
+          echo "Line count ${1}: values ($(echo "${values}" | wc -l)), template ($(echo "${template_out}" | wc -l)), template_clean ($(echo "${template_clean}" | wc -l))" >&2
+          echo "$template_clean"
+        }
+
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
-
         echo "## Helm diffs" >> "$GITHUB_OUTPUT"
 
+        any_failed=0
         for helm_file in ${MODIFIED_HELM_FILES}; do
+          # Begin output
           echo "Processing file: $helm_file"
+          echo >> "$GITHUB_OUTPUT"
+          echo "### ${helm_file}" >> "$GITHUB_OUTPUT"
 
           # Before
           before_helm_file="base/${helm_file}"
-          before_name=$(yq '. | select(.kind == "HelmRelease").metadata.name' "${before_helm_file}")
-          before_namespace=$(yq '. | select(.kind == "HelmRelease").metadata.namespace' "${before_helm_file}")
-          before_version=$(yq '. | select(.kind == "HelmRelease") | .spec.chart.spec.version' "${before_helm_file}")
-          before_url=$(yq '. | select(.kind == "HelmRepository") | .spec.url' "${before_helm_file}")
-          before_chart=$(yq '. | select(.kind == "HelmRelease") | .spec.chart.spec.chart' "${before_helm_file}")
-          echo "Previous chart version: $before_version ($before_chart from $before_url)"
-
-          before_values=$(yq '. | select(.kind == "HelmRelease").spec.values' "${before_helm_file}")
-          before_template=$(helm template "${before_name}" -n "${before_namespace}" "${before_chart}" --repo "${before_url}" --version "${before_version}" -f <(echo "${before_values}"))
-          # before_template_clean=$(yq -P 'sort_keys(..) comments=""' -o=props <(echo "${before_template}"))
-          before_template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${before_template}"))
-          echo "Previous line counts: values ($(echo "${before_values}" | wc -l)), template ($(echo "${before_template}" | wc -l)), template_clean ($(echo "${before_template_clean}" | wc -l))"
+          return_code=0
+          before_out=$(helm_template before "${before_helm_file}") || return_code=1
+          if [ $return_code -ne 0 ]; then
+            echo '```' >> "$GITHUB_OUTPUT"
+            echo "${before_out}" >> "$GITHUB_OUTPUT"
+            echo '```' >> "$GITHUB_OUTPUT"
+            any_failed=1
+            continue
+          fi
 
           # After
           after_helm_file="head/${helm_file}"
-          after_name=$(yq '. | select(.kind == "HelmRelease").metadata.name' "${after_helm_file}")
-          after_namespace=$(yq '. | select(.kind == "HelmRelease").metadata.namespace' "${after_helm_file}")
-          after_version=$(yq '. | select(.kind == "HelmRelease") | .spec.chart.spec.version' "${after_helm_file}")
-          after_url=$(yq '. | select(.kind == "HelmRepository") | .spec.url' "${after_helm_file}")
-          after_chart=$(yq '. | select(.kind == "HelmRelease") | .spec.chart.spec.chart' "${after_helm_file}")
-          echo "New chart version: $after_version ($after_chart from $after_url)"
-
-          after_values=$(yq '. | select(.kind == "HelmRelease").spec.values' "${after_helm_file}")
-          after_template=$(helm template "${after_name}" -n "${after_namespace}" "${after_chart}" --repo "${after_url}" --version "${after_version}" -f <(echo "${after_values}"))
-          # after_template_clean=$(yq -P 'sort_keys(..) comments=""' -o=props <(echo "${after_template}"))
-          after_template_clean=$(yq -P 'sort_keys(..) comments=""' <(echo "${after_template}"))
-          echo "New line counts: values ($(echo "${after_values}" | wc -l)), template ($(echo "${after_template}" | wc -l)), template_clean ($(echo "${after_template_clean}" | wc -l))"
+          after_out=$(helm_template after "${after_helm_file}") || true
 
           # Diff
-          diff=$(diff --unified=5 <(echo "${before_template_clean}") <(echo "${after_template_clean}") || true)
-          echo -e "Diff has $(echo $diff | wc -l) line(s)\n"
-
-          # Generate output
-          echo >> "$GITHUB_OUTPUT"
-          echo "### ${helm_file}" >> "$GITHUB_OUTPUT"
+          diff_out=$(diff --unified=5 <(echo "${before_out}") <(echo "${after_out}")) || true
+          echo -e "Diff has $(echo "$diff_out" | wc -l) line(s)\n"
           echo '```' >> "$GITHUB_OUTPUT"
-          echo "${diff}" >> "$GITHUB_OUTPUT"
+          echo "${diff_out}" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
 
         done
         echo "$EOF" >> "$GITHUB_OUTPUT"
+        echo "ANY_FAILED=$any_failed" >> "$GITHUB_OUTPUT"
 
-    - id: pr-comment
+    - id: pr_comment
       name: Add PR comment
       uses: mshick/add-pr-comment@v2
       if: contains(fromJSON('["pull_request_target"]'), github.event_name)
       with:
-        message-id: stag
+        message-id: diff
         refresh-message-position: true
         message: |
-          ${{ steps.run-diff.outputs.DIFF_OUT }}
+          ${{ steps.run_diff.outputs.DIFF_OUT }}
+
+    - id: fail_job
+      name: Diff failed?
+      uses: actions/github-script@v7
+      if: ${{ steps.run_diff.outputs.ANY_FAILED == 1 }}
+      with:
+        script: |
+          core.setFailed('Failed to run diff')
