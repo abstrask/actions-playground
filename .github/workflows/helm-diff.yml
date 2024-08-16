@@ -91,7 +91,6 @@ jobs:
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
         echo "DIFF_OUT<<$EOF" >> "$GITHUB_OUTPUT"
         echo "## Helm diffs" >> "$GITHUB_OUTPUT"
-        echo "> Test" >> "$GITHUB_OUTPUT"
 
         any_failed=0
         for helm_file in ${MODIFIED_HELM_FILES}; do
@@ -119,6 +118,7 @@ jobs:
           # Diff
           diff_out=$(diff --unified=5 <(echo "${before_out}") <(echo "${after_out}")) || true
           echo -e "Diff has $(echo "$diff_out" | wc -l) line(s)\n"
+          [ -z "${diff_out}" ] && diff_out="No changes"
           echo '```' >> "$GITHUB_OUTPUT"
           echo "${diff_out}" >> "$GITHUB_OUTPUT"
           echo '```' >> "$GITHUB_OUTPUT"
