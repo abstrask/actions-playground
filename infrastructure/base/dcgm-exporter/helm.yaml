@@ -1,3 +1,4 @@
+# This comment represents a change, that has no effect on the rendered template
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
