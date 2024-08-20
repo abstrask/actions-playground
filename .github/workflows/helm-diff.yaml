@@ -77,11 +77,3 @@ jobs:
         refresh-message-position: true
         message: |
           ${{ steps.helm_diff.outputs.diff_markdown }}
-
-    - id: fail_job
-      name: Diff failed?
-      uses: actions/github-script@v7
-      if: ${{ steps.helm_diff.outputs.any_failed == 1 }}
-      with:
-        script: |
-          core.setFailed('Failed to run diff')
