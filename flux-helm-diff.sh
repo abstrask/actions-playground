@@ -57,7 +57,7 @@ echo "## Flux Helm diffs" >> "$GITHUB_OUTPUT"
 any_failed=0
 for helm_file in "${helm_files[@]}"; do
     # Begin output
-    echo "\nProcessing file \"$helm_file\""
+    echo -e "\nProcessing file \"$helm_file\""
     echo >> "$GITHUB_OUTPUT"
     echo "### ${helm_file}" >> "$GITHUB_OUTPUT"
 
@@ -79,7 +79,7 @@ for helm_file in "${helm_files[@]}"; do
 
     # Template diff
     diff_out=$(diff --unified=5 <(echo "${before_out}") <(echo "${after_out}")) || true
-    echo -e "Diff has $(echo "$diff_out" | wc -l) line(s)"
+    echo "Diff has $(echo "$diff_out" | wc -l) line(s)"
     [ -z "${diff_out}" ] && diff_out="No changes"
     {
         echo '```'
