@@ -13,10 +13,11 @@ helm_template() {
         return 1
     fi
 
-    if [ "${test}" == "" ]; then
-        helm_file="test/${2}"
-    else
+    # Set test = <something> to run against Helm teplates under test/
+    if [ -z "${test}" ]; then
         helm_file="${2}"
+    else
+        helm_file="test/${2}"
     fi
 
     if [ ! -f "${helm_file}" ]; then
