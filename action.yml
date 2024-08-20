@@ -20,6 +20,13 @@ runs:
       with:
         helm: latest
         yq: latest
+
+    - name: Set GitHub Path
+      run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
+      shell: bash
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+
     - id: diff
       name: Helm diff
       run: flux-helm-diff.sh ${{ inputs.helm_files }}
