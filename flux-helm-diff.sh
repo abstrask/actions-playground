@@ -52,7 +52,7 @@ helm_template() {
 
 EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
 echo "markdown<<$EOF" >> "$GITHUB_OUTPUT"
-echo "## Helm diffs" >> "$GITHUB_OUTPUT"
+echo "## Flux Helm diffs" >> "$GITHUB_OUTPUT"
 
 any_failed=0
 for helm_file in "${helm_files[@]}"; do

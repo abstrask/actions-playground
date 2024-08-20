@@ -36,6 +36,13 @@ jobs:
       pull-requests: write
 
     steps:
+    - id: dependencies
+      name: Install dependencies
+      uses: alexellis/arkade-get@master
+      with:
+        helm: latest
+        yq: latest
+
     - id: checkout_base
       uses: actions/checkout@v4
       with:
