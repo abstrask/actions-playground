@@ -4,9 +4,13 @@ on:
 jobs:
   replace-assignee:
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.user.login == vars.REPLACE_ASSIGNEE }}
     steps:
+    - id: init
+      run: |
+        echo "Will replace assignee \"${{ vars.REPLACE_ASSIGNEE }}\" with \"${{ vars.REPLACE_ASSIGNEE_WITH }}\""
+        echo "PR opened by \"${{ github.event.pull_request.user.login }}\""
     - id: replace-assignee
+      if: ${{ github.event.pull_request.user.login == vars.REPLACE_ASSIGNEE }}
       run: |
         gh pr edit ${{ github.event.pull_request.number }} --remove-assignee "${{ vars.REPLACE_ASSIGNEE }}"
         gh pr edit ${{ github.event.pull_request.number }} --add-assignee "${{ vars.REPLACE_ASSIGNEE_WITH }}"
