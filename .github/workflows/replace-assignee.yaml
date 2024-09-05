@@ -1,0 +1,12 @@
+name: Replace assignee
+on:
+  - pull_request
+jobs:
+  replace-assignee:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.user.login == vars.REPLACE_ASSIGNEE }}
+    steps:
+    - id: replace-assignee
+      run: |
+        gh pr edit ${{ github.event.pull_request.number }} --remove-assignee "${{ vars.REPLACE_ASSIGNEE }}"
+        gh pr edit ${{ github.event.pull_request.number }} --add-assignee "${{ vars.REPLACE_ASSIGNEE_WITH }}"
