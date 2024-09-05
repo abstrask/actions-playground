@@ -17,7 +17,7 @@ jobs:
       name: Replace assignee
       if: ${{ github.event.pull_request.user.login == vars.REPLACE_ASSIGNEE }}
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         gh pr edit ${{ github.event.pull_request.number }} --remove-assignee "${{ vars.REPLACE_ASSIGNEE }}"
         gh pr edit ${{ github.event.pull_request.number }} --add-assignee "${{ vars.REPLACE_ASSIGNEE_WITH }}"
