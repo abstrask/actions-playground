@@ -2,22 +2,20 @@ name: Replace assignee
 on:
   - pull_request
 jobs:
-
   replace-assignee:
+    name: Replace assignee
     runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_CREATOR: ${{ github.event.pull_request.user.login }}
+      ADD_ASSIGNEE: ${{ vars.REMOVE_ASSIGNEE }}
+      REMOVE_ASSIGNEE: ${{ vars.ADD_ASSIGNEE }}
+
     steps:
-
-      - id: init
-      name: Init
-      run: |
-        echo "Will replace assignee \"${{ vars.REPLACE_ASSIGNEE }}\" with \"${{ vars.REPLACE_ASSIGNEE_WITH }}\""
-        echo "PR opened by \"${{ github.event.pull_request.user.login }}\""
-
-        - id: replace-assignee
-      name: Replace assignee
-      if: ${{ github.event.pull_request.user.login == vars.REPLACE_ASSIGNEE }}
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh pr edit ${{ github.event.pull_request.number }} --remove-assignee "${{ vars.REPLACE_ASSIGNEE }}"
-        gh pr edit ${{ github.event.pull_request.number }} --add-assignee "${{ vars.REPLACE_ASSIGNEE_WITH }}"
+    - id: remove-assignee
+      name: Remove assignee
+      if: ${{ github.event.pull_request.user.login == vars.REPLACE_ASSIGNEE_PR_CREATOR }}
+      # && var not empty
+      run: gh pr edit $PR --remove-assignee "$REMOVE_ASSIGNEE"
