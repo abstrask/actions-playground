@@ -8,8 +8,8 @@ jobs:
     - id: init
       name: Init
       run: |
-        echo "Will replace assignee ${{ vars.REPLACE_ASSIGNEE }} with ${{ vars.REPLACE_ASSIGNEE_WITH }}"
-        echo "PR opened by ${{ github.event.pull_request.user.login }}"
+        echo "Will replace assignee \"${{ vars.REPLACE_ASSIGNEE }}\" with \"${{ vars.REPLACE_ASSIGNEE_WITH }}\""
+        echo "PR opened by \"${{ github.event.pull_request.user.login }}\""
     - id: replace-assignee
       name: Replace assignee
       if: ${{ github.event.pull_request.user.login == vars.REPLACE_ASSIGNEE }}
