@@ -1,0 +1,14 @@
+name: Run Helm diff
+on:
+  - pull_request
+jobs:
+  change_reviewer:
+    runs-on: ubuntu-latest
+    steps:
+    - id: change_reviewer
+      run: |
+        echo "${{ github.event.pull_request.user.login }}"
+        echo
+        echo "${{ github.event.pull_request }}"
+
+
