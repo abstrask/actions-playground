@@ -1,11 +1,11 @@
-name: Run Helm diff
+name: Update reviewer
 on:
   - pull_request
 jobs:
-  change_reviewer:
+  update_reviewer:
     runs-on: ubuntu-latest
     steps:
-    - id: change_reviewer
+    - id: update_reviewer
       run: |
         echo "${{ github.event.pull_request.user.login }}"
         echo
