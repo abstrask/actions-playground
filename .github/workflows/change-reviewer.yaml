@@ -4,11 +4,10 @@ on:
 jobs:
   update_reviewer:
     runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.user.login == vars.REPLACE_REVIEWER }}
     steps:
     - id: update_reviewer
       run: |
         echo "${{ github.event.pull_request.user.login }}"
         echo
-        echo "${{ github.event.pull_request }}"
-
-
+        echo "${{ vars.REPLACE_REVIEWER }}"
