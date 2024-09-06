@@ -23,6 +23,6 @@ jobs:
       run: |
         peeps=($(gh pr view $PR_NUMBER --repo $GITHUB_REPOSITORY --json assignees --jq '.assignees[].login'))
         for p in $peeps; do
-          gh pr edit $PR_NUMBER --remove-assignee $p
+          gh pr edit $PR_NUMBER --repo $GITHUB_REPOSITORY --remove-assignee $p
         done
 
