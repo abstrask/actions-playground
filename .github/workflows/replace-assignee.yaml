@@ -15,16 +15,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.user.login == vars.REPLACE_ASSIGNEE_PR_CREATOR
 
+                        # REPLACE_ASSIGNEE_WITH
+                    # reviewRequests
     steps:
-    - id: remove-assignee
-      name: Remove assignee
-      run: gh pr edit $PR_NUMBER --repo $GITHUB_REPOSITORY --remove-assignee abstrask
+    - id: remove-assignees
+      name: Remove assignees
+      run: |
+        peeps=($(gh pr view $PR_NUMBER --repo $GITHUB_REPOSITORY --json assignees --jq '.assignees[].login'))
+        for p in $peeps; do
+          gh pr edit $PR_NUMBER --remove-assignee $p
+        done
 
-      ## Loop through any assignees and remove?
-                # Close existing PRs
-          # prs=$(gh pr list --state open --base master --json number,headRefName --jq '.[] | select(.headRefName | test("patch-sunstone-")) | .number')
-          # for pr in $prs; do
-          #   gh pr close $pr --delete-branch
-          # done
-
-                    # REPLACE_ASSIGNEE_WITH
