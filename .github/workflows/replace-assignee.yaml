@@ -1,21 +1,30 @@
 name: Replace assignee
 on:
   - pull_request
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+
+permissions:
+  pull-requests: write
+
 jobs:
   replace-assignee:
     name: Replace assignee
     runs-on: ubuntu-latest
-
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      PR_NUMBER: ${{ github.event.pull_request.number }}
-      PR_CREATOR: ${{ github.event.pull_request.user.login }}
-      ADD_ASSIGNEE: ${{ vars.REMOVE_ASSIGNEE }}
-      REMOVE_ASSIGNEE: ${{ vars.ADD_ASSIGNEE }}
+    if: github.event.pull_request.user.login == vars.REPLACE_ASSIGNEE_PR_CREATOR
 
     steps:
     - id: remove-assignee
       name: Remove assignee
-      if: ${{ github.event.pull_request.user.login == vars.REPLACE_ASSIGNEE_PR_CREATOR }}
-      # && var not empty
-      run: gh pr edit $PR --remove-assignee "$REMOVE_ASSIGNEE"
+      run: gh pr edit $PR_NUMBER --remove-assignee abstrask
+
+      ## Loop through any assignees and remove?
+                # Close existing PRs
+          # prs=$(gh pr list --state open --base master --json number,headRefName --jq '.[] | select(.headRefName | test("patch-sunstone-")) | .number')
+          # for pr in $prs; do
+          #   gh pr close $pr --delete-branch
+          # done
+
+                    # REPLACE_ASSIGNEE_WITH
