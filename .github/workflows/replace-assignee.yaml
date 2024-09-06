@@ -5,6 +5,7 @@ on:
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   PR_NUMBER: ${{ github.event.pull_request.number }}
+  REPLACE_ASSIGNEE_WITH: ${{ vars.REPLACE_ASSIGNEE_WITH }}
 
 permissions:
   pull-requests: write
@@ -29,4 +30,6 @@ jobs:
 
     - id: add-assignee
       name: Add assignee
-      run: gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --add-assignee "$REPLACE_ASSIGNEE_WITH"
+      run: |
+        echo "Adding assignee $REPLACE_ASSIGNEE_WITH"
+        gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --add-assignee "$REPLACE_ASSIGNEE_WITH"
