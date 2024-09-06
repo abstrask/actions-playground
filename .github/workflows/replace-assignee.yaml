@@ -18,7 +18,7 @@ jobs:
     steps:
     - id: remove-assignee
       name: Remove assignee
-      run: gh pr edit $PR_NUMBER --remove-assignee abstrask
+      run: gh pr edit $PR_NUMBER --repo $GITHUB_REPOSITORY --remove-assignee abstrask
 
       ## Loop through any assignees and remove?
                 # Close existing PRs
