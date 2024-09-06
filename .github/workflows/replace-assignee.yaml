@@ -21,8 +21,9 @@ jobs:
     - id: remove-assignees
       name: Remove assignees
       run: |
-        peeps=($(gh pr view $PR_NUMBER --repo $GITHUB_REPOSITORY --json assignees --jq '.assignees[].login'))
-        for p in $peeps; do
-          gh pr edit $PR_NUMBER --repo $GITHUB_REPOSITORY --remove-assignee $p
+        peeps=()
+        while IFS='' read -r line; do peeps+=("$line"); done < <(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json assignees --jq '.assignees[].login')
+        for p in "${peeps[@]}"; do
+          echo "Removing assignee $p"
+          gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --remove-assignee $p
         done
-
