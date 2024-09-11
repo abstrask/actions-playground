@@ -1,0 +1,38 @@
+name: Replace reviewer user
+on:
+  - pull_request
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  ADD_REVIEW_USER: ${{ vars.ADD_REVIEW_USER }}
+
+permissions:
+  pull-requests: write
+
+
+jobs:
+  replace-assignee:
+    name: Replace reviewer teams
+    runs-on: ubuntu-latest
+    # Do not replace reviewer if PR opened by specific user, e.g. GitHub service account used by Renovate
+    if: github.event.pull_request.user.login != vars.REPLACE_TEAM_REVIEWER_IGNORE_PR_CREATOR
+
+    steps:
+    - id: remove-review-team
+      name: Remove review teams
+      # gh pr edit -add-reviewer/--remove-reviewer does not support teams - have to use raw API call
+      run: |
+        teams=()
+        while IFS='' read -r line; do teams+=("$line"); done < <(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json reviewRequests --jq '.reviewRequests[] | select(.__typename == "Team") | .slug')
+        for t in "${teams[@]}"; do
+            tname=$(echo "$t" | cut -d'/' -f2-)
+            echo "Removing team reviewer $tname"
+            gh api -X DELETE -H "Accept: application/vnd.github.v3+json" "/repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/requested_reviewers" -f "reviewers[]=" -f "team_reviewers[]=${tname}" > /dev/null
+        done
+
+    - id: add-review-team
+      name: Add review team
+      run: |
+        echo "Adding team reviewer $ADD_REVIEW_TEAM"
+        gh api -X POST -H "Accept: application/vnd.github.v3+json" "/repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/requested_reviewers" -f "reviewers[]=" -f "team_reviewers[]=${ADD_REVIEW_TEAM}" > /dev/null
