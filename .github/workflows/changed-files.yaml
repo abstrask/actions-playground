@@ -65,6 +65,8 @@ jobs:
     - id: test
       name: Test
       run: |
+        ls
+        pwd
         helm_files=($(find ./infrastructure/base -type f -name 'helm.yaml' | sed "s|^./infrastructure/base/||"))
 
         echo "Plain: ${helm_files}"
