@@ -1,0 +1,59 @@
+name: Changed files
+on:
+  - pull_request_target
+jobs:
+  changed_files:
+    name: Do stuff with changed files
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+    - id: checkout_base
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.base_ref }}
+        path: base
+
+    - name: Get changed Helm files
+      id: changed_files_helm
+      uses: tj-actions/changed-files@v44
+      with:
+        files: |
+          infrastructure/base/*/helm.yaml
+
+    - id: show_changed
+      name: Show changed files
+      env:
+        CHANGED_FILES: ${{ steps.changed_files_helm.outputs.all_changed_files }}
+      run: |
+        echo Using env variable
+        echo "Count: ${#CHANGED_FILES[@]}"
+
+        echo "Plain: ${CHANGED_FILES}"
+        for file in ${CHANGED_FILES}; do
+            echo "$file changed"
+        done
+        echo
+
+        echo "At: ${CHANGED_FILES[@]}"
+        for file in ${CHANGED_FILES[@]}; do
+            echo "$file changed"
+        done
+        echo
+
+        echo "Asterisk: ${CHANGED_FILES[*]}"
+        for file in ${CHANGED_FILES[*]}; do
+            echo "$file changed"
+        done
+        echo
+
+        echo Using output directly
+        # echo "Count:     ${#CHANGED_FILES[@]}"
+        echo "Plain:     ${{ steps.changed_files_helm.outputs.all_changed_files }}"
+        # echo "At:        ${CHANGED_FILES[@]}"
+        # echo "Asterisk:  ${CHANGED_FILES[*]}"
+        for file in ${{ steps.changed_files_helm.outputs.all_changed_files }}; do
+            echo "$file changed"
+        done
