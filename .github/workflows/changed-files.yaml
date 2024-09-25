@@ -32,28 +32,32 @@ jobs:
         echo "Count: ${#CHANGED_FILES[@]}"
 
         echo "Plain: ${CHANGED_FILES}"
+        echo "Count: ${#CHANGED_FILES}"
         for file in ${CHANGED_FILES}; do
             echo "$file changed"
         done
         echo
 
         echo "At: ${CHANGED_FILES[@]}"
+        echo "Count: ${#CHANGED_FILES[@]}"
         for file in ${CHANGED_FILES[@]}; do
             echo "$file changed"
         done
         echo
 
         echo "Asterisk: ${CHANGED_FILES[*]}"
+        echo "Count: ${#CHANGED_FILES[*]}"
         for file in ${CHANGED_FILES[*]}; do
             echo "$file changed"
         done
         echo
 
         echo Using output directly
-        # echo "Count:     ${#CHANGED_FILES[@]}"
-        echo "Plain:     ${{ steps.changed_files_helm.outputs.all_changed_files }}"
-        # echo "At:        ${CHANGED_FILES[@]}"
-        # echo "Asterisk:  ${CHANGED_FILES[*]}"
+        # echo "Count: ${#CHANGED_FILES[@]}"
+        echo "Plain: ${{ steps.changed_files_helm.outputs.all_changed_files }}"
         for file in ${{ steps.changed_files_helm.outputs.all_changed_files }}; do
             echo "$file changed"
         done
+
+        # echo "At: ${CHANGED_FILES[@]}"
+        # echo "Asterisk: ${CHANGED_FILES[*]}"
