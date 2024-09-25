@@ -51,6 +51,14 @@ jobs:
         done
         echo
 
+        files_brack=(${CHANGED_FILES[@]})
+        echo "Brack-At: ${files_brack[@]}"
+        echo "Count: ${#files_brack[@]}"
+        for file in (${files_brack[@]}); do
+            echo "$file changed"
+        done
+        echo
+
         echo Using output directly
         # echo "Count: ${#CHANGED_FILES[@]}"
         echo "Plain: ${{ steps.changed_files_helm.outputs.all_changed_files }}"
@@ -84,6 +92,14 @@ jobs:
         echo "Asterisk: ${files_string[*]}"
         echo "Count: ${#files_string[*]}"
         for file in ${files_string[*]}; do
+            echo "$file changed"
+        done
+        echo
+
+        files_brack=(${files_string[@]})
+        echo "Brack-At: ${files_brack[@]}"
+        echo "Count: ${#files_brack[@]}"
+        for file in (${files_brack[@]}); do
             echo "$file changed"
         done
         echo
