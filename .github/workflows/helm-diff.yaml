@@ -64,7 +64,7 @@ jobs:
 
     - id: helm_diff
       name: Helm diff
-      uses: abstrask/flux-helm-diff@dev
+      uses: abstrask/flux-helm-diff@v2
       with:
         helm_files: ${{ steps.changed_files_helm.outputs.all_changed_files }}
 
