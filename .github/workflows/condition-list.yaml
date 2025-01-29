@@ -16,6 +16,7 @@ jobs:
     - id: remove
       name: Remove review teams
       run: |
+        echo "Team reviewer to add later: \"$ADD_REVIEW_TEAM\""
         jq -r '.[]' <<< '${{ steps.get.outputs.review_team_slugs }}' | \
         while read -r slug; do
             if [[ "${slug}" == "recoord/${ADD_REVIEW_TEAM}" ]]; then
