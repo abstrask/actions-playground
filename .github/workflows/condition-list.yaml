@@ -19,7 +19,8 @@ jobs:
     - id: remove
       name: Remove review teams
       run: |
-        echo "${{ steps.get.outputs.review_team_slugs }}" | jq -r '.[]' | while read -r slug; do
+        jq -r '.[]' <<< "${{ steps.get.outputs.review_team_slugs }}" | \
+        while read -r slug; do
             echo "Running command for $slug"
         done
 
