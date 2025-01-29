@@ -12,21 +12,24 @@ jobs:
     steps:
     - id: get
       run: |
-        REVIEW_TEAMS="[\"recoord/infrastructure-contributors\",\"recoord/infrastructure-maintenance\"]"
-        echo "Teams assigned as reviewers: ${REVIEW_TEAMS}"
-        echo "review_teams=${REVIEW_TEAMS}" >> "$GITHUB_OUTPUT"
+        REVIEW_TEAM_SLUGS="[\"recoord/infrastructure-contributors\",\"recoord/infrastructure-maintenance\"]"
+        echo "Teams assigned as reviewers: ${REVIEW_TEAM_SLUGS}"
+        echo "review_team_slugs=${REVIEW_TEAM_SLUGS}" >> "$GITHUB_OUTPUT"
 
     - id: remove
       name: Remove review teams
       run: |
-        IFS=, read -r -a review_teams <<< "${{ steps.get.outputs.review_teams }}"
-        for t in "${review_teams[@]}"; do
-            if [[ "${t}" == "${ADD_REVIEW_TEAM}" ]]; then
-                echo "Leaving \"$t\" as reviewer"
-            else
-                echo "Removing team \"$t\" as reviewer"
-            fi
+        echo "${{ steps.get.outputs.review_team_slugs }}" | jq -r '.[]' | while read -r slug; do
+            echo "Running command for $slug"
         done
+
+# for t in "${review_team_slugs[@]}"; do
+#     if [[ "${t}" == "${ADD_REVIEW_TEAM}" ]]; then
+#         echo "Leaving \"$t\" as reviewer"
+#     else
+#         echo "Removing team \"$t\" as reviewer"
+#     fi
+# done
 
 
 #   contains(fromJSON('["pull_request_target"]'), github.event_name)
