@@ -30,7 +30,7 @@ jobs:
 
     - id: add
       name: Add review team
-      if: ${{ !contains(fromJSON(steps.get.outputs.review_team_slugs, vars.ADD_REVIEW_TEAM), format('recoord/', vars.ADD_REVIEW_TEAM)) }}
+      if: ${{ ! contains(fromJSON(steps.get.outputs.review_team_slugs), format('recoord/{0}', vars.ADD_REVIEW_TEAM)) }}
       run: |
         echo "Adding team reviewer \"$ADD_REVIEW_TEAM\""
 
