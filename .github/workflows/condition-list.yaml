@@ -2,9 +2,6 @@ name: "Conditions: List"
 on:
   workflow_dispatch: {}
 
-env:
-  ADD_REVIEW_TEAM: "infrastructure"
-
 jobs:
   main_job:
     name: "Main"
