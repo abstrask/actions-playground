@@ -12,7 +12,7 @@ jobs:
     steps:
     - id: get
       run: |
-        REVIEW_TEAM_SLUGS="[\"recoord/infrastructure-contributors\",\"recoord/infrastructure-maintenance\",,\"recoord/infrastructure\"]"
+        REVIEW_TEAM_SLUGS="[\"recoord/infrastructure-contributors\",\"recoord/infrastructure-maintenance\",\"recoord/infrastructure\"]"
         echo "Teams assigned as reviewers: ${REVIEW_TEAM_SLUGS}"
         echo "review_team_slugs=${REVIEW_TEAM_SLUGS}" >> "$GITHUB_OUTPUT"
 
