@@ -12,7 +12,7 @@ jobs:
     steps:
     - id: get
       run: |
-        REVIEW_TEAM_SLUGS="[\"recoord/infrastructure-contributors\",\"recoord/infrastructure-maintenance\",\"recoord/infrastructure\"]"
+        REVIEW_TEAM_SLUGS="[\"recoord/infrastructure-contributors\",\"recoord/infrastructure-maintenance\"]"
         echo "Teams assigned as reviewers: ${REVIEW_TEAM_SLUGS}"
         echo "review_team_slugs=${REVIEW_TEAM_SLUGS}" >> "$GITHUB_OUTPUT"
 
@@ -28,8 +28,10 @@ jobs:
             fi
         done
 
-# for t in "${review_team_slugs[@]}"; do
-# done
-
+    - id: add
+      name: Add review team
+      if: ${{ !contains(fromJSON(steps.get.outputs.review_team_slugs, vars.ADD_REVIEW_TEAM), format('recoord/', vars.ADD_REVIEW_TEAM)) }}
+      run: |
+        echo "Adding team reviewer \"$ADD_REVIEW_TEAM\""
 
 #   contains(fromJSON('["pull_request_target"]'), github.event_name)
