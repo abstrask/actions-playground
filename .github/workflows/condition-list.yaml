@@ -12,7 +12,7 @@ jobs:
     steps:
     - id: get
       run: |
-        REVIEW_TEAM_SLUGS="[\"recoord/infrastructure-contributors\",\"recoord/infrastructure-maintenance\"]"
+        REVIEW_TEAM_SLUGS="[\"recoord/infrastructure-contributors\",\"recoord/infrastructure-maintenance\",,\"recoord/infrastructure\"]"
         echo "Teams assigned as reviewers: ${REVIEW_TEAM_SLUGS}"
         echo "review_team_slugs=${REVIEW_TEAM_SLUGS}" >> "$GITHUB_OUTPUT"
 
@@ -21,15 +21,14 @@ jobs:
       run: |
         jq -r '.[]' <<< '${{ steps.get.outputs.review_team_slugs }}' | \
         while read -r slug; do
-            echo "Running command for $slug"
+            if [[ "${slug}" == "recoord/${ADD_REVIEW_TEAM}" ]]; then
+                echo "Leaving \"$slug\" as reviewer"
+            else
+                echo "Removing team \"$slug\" as reviewer"
+            fi
         done
 
 # for t in "${review_team_slugs[@]}"; do
-#     if [[ "${t}" == "${ADD_REVIEW_TEAM}" ]]; then
-#         echo "Leaving \"$t\" as reviewer"
-#     else
-#         echo "Removing team \"$t\" as reviewer"
-#     fi
 # done
 
 
