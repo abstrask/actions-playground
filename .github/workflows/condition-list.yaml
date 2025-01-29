@@ -1,0 +1,35 @@
+name: "Conditions: List"
+on:
+  workflow_dispatch: {}
+    # inputs:
+    #   image_tag:
+    #     description: "Heroku CLI image tag"
+    #     required: true
+    #     default: "7.65.0-1"
+    #     type: string
+
+jobs:
+  main_job:
+    name: "Main"
+    runs-on: ubuntu-latest
+    steps:
+    - id: get
+      run: |
+        REVIEW_TEAMS="[\"recoord/infrastructure-contributors\",\"recoord/infrastructure-maintenance\"]"
+        echo "Teams assigned as reviewers: ${REVIEW_TEAMS}"
+        echo "review_teams=${REVIEW_TEAMS}" >> "$GITHUB_OUTPUT"
+
+    - id: remove
+      name: Remove review teams
+      run: |
+        IFS=, read -r -a review_teams <<< "${{ steps.get.outputs.review_teams }}"
+        for t in "${review_teams[@]}"; do
+            if [[ "${t}" == "${ADD_REVIEW_TEAM}" ]]; then
+                echo "Leaving \"$t\" as reviewer"
+            else
+                echo "Removing team \"$t\" as reviewer"
+            fi
+        done
+
+
+#   contains(fromJSON('["pull_request_target"]'), github.event_name)
