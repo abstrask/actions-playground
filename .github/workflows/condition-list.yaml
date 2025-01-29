@@ -1,12 +1,9 @@
 name: "Conditions: List"
 on:
   workflow_dispatch: {}
-    # inputs:
-    #   image_tag:
-    #     description: "Heroku CLI image tag"
-    #     required: true
-    #     default: "7.65.0-1"
-    #     type: string
+
+env:
+  ADD_REVIEW_TEAM: "infrastructure"
 
 jobs:
   main_job:
