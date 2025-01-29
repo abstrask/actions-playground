@@ -2,6 +2,9 @@ name: "Conditions: List"
 on:
   workflow_dispatch: {}
 
+env:
+  ADD_REVIEW_TEAM: vars.ADD_REVIEW_TEAM
+
 jobs:
   main_job:
     name: "Main"
