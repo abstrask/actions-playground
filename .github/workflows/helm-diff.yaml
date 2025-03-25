@@ -57,7 +57,7 @@ jobs:
 
     - name: Get changed Helm files
       id: changed_files_helm
-      uses: tj-actions/changed-files@v44
+      uses: tj-actions/changed-files@v46
       with:
         files: |
           infrastructure/base/*/helm.yaml
