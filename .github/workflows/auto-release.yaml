@@ -42,4 +42,5 @@ jobs:
       - uses: sersoft-gmbh/running-release-tags-action@v3
         if: ${{ (steps.release.outputs.tag_name || inputs.running_fallback_tag) != '' }}
         with:
+          create-release-as-draft: true
           tag: ${{ steps.release.outputs.tag_name || inputs.running_fallback_tag }}
