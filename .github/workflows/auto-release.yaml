@@ -14,7 +14,7 @@ on:
       running_fallback_tag:
         description: "Fallback tag for running release"
         type: string
-        default: "v0.0.7"
+        # default: "v0.0.7"
 
   push:
     branches: ["main"]
