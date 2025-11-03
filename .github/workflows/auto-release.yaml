@@ -24,6 +24,7 @@ jobs:
         with:
           bump_version_scheme: patch # norelease?
           tag_prefix: "v"
+      - uses: actions/checkout@v5
       - uses: sersoft-gmbh/running-release-tags-action@v3
         with:
           tag: ${{ steps.release.outputs.tag_name }}
