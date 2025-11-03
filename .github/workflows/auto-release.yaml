@@ -5,7 +5,7 @@ on:
   push:
     branches: ["main"]
     paths-ignore:
-      - ".github/**"
+      # - ".github/**"
       - ".gitignore"
       - "**/*.md"
       - "test/**"
@@ -19,7 +19,8 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: rymndhng/release-on-push-action@master
+      - id: release
+        uses: rymndhng/release-on-push-action@v0.28.0
         with:
           bump_version_scheme: patch # norelease?
           tag_prefix: "v"
