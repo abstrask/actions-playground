@@ -26,5 +26,8 @@ jobs:
           tag_prefix: "v"
       - uses: actions/checkout@v5
       - uses: sersoft-gmbh/running-release-tags-action@v3
+
         with:
+          create-release-as-draft: true
           tag: ${{ steps.release.outputs.tag_name }}
+          update-full-release: true
