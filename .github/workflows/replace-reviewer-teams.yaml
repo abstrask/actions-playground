@@ -3,7 +3,7 @@ on:
   - pull_request
 
 env:
-  GH_TOKEN: ${{ secrets.GH_TOKEN }} # must use PAT with "repo" scope
+  GH_TOKEN: ${{ secrets.REPLACE_REVIEWER_TEAMS_TOKEN }} # must use PAT with "repo" scope
   PR_NUMBER: ${{ github.event.pull_request.number }}
   ADD_REVIEW_TEAM: ${{ vars.ADD_REVIEW_TEAM }}
 
