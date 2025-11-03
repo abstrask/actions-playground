@@ -12,7 +12,7 @@ on:
           - minor
           - major
       running_fallback_tag:
-        description: "Fallback tag for running release"
+        description: "Update running release for tag"
         type: string
         # default: "v0.0.7"
 
